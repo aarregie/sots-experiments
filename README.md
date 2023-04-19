@@ -34,7 +34,7 @@ An example of the framework execution:
 python main.py 78 3 1
 ```
 
-This combination of arguments equals battery number 78, temperature and length 50.
+By executing this command the experiment for battery number 78, variable temperature and series length 50 is performed.
 
 ## Evaluation
 
