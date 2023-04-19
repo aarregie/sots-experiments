@@ -1,0 +1,13 @@
+\data
+\output
+.vscode/
+*.log
+\interpolation
+/interpolators
+\src/__pycache__
+TRIAL*
+src/utils/__pycache__/
+docs/
+.pylint.d/
+EXPLORE*
+ADAPT*
