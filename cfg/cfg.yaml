@@ -1,0 +1,19 @@
+
+# 
+output_folder: output/
+general_results_folder: general_results
+interpolators_folder: interpolation
+predictions_folder: predictions
+parameters_folder: parameters
+data_path : data/cell/
+cell : b3c25
+s : summary
+c : cycles
+var : T
+step : 20
+
+#array de instantes. Longitud del array.
+n_instants: 50
+
+first_cycle: 100
+last_cycle: 
