@@ -34,10 +34,21 @@ An example of the framework execution:
 python main.py 78 3 1
 ```
 
-This combination of arguments equals battery number 78, temperature and length 50.
+By executing this command the experiment for battery number 78, variable temperature and series length 50 is performed.
 
 ## Evaluation
 
 Once the execution of `main.py` finishes, errors are computed by running the `main_errors.py` script on the command line. The execution is analogous to the experimental script.
 Additionally, scripts with the suffix _PLOT_ have been used to generate the visualisations of the error distributions of the different models and the training time results.
 
+## Support and Author
+
+Amaia Arregi Egibar
+
+aarregui@ideko.es
+
+[![ForTheBadge built-with-science](http://ForTheBadge.com/images/badges/built-with-science.svg)](https://github.com/aarregie)
+
+## Citation
+
+If you find useful the code in your research, please include explicit mention of our work in your publication with the following corresponding entry in your bibliography:
