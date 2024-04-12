@@ -7,14 +7,12 @@ Created on Wed Jun  8 13:28:10 2022
 
 import sys
 import numpy as np
-from src.pipeline1_GP import main_GP
-from src.pipeline1_ARIMA import main_ARIMA
-from src.pipeline2_BVAR import main_BVAR
-from src.pipeline2_LRVAR import main_LRVAR
-from src.pipeline2_MTGP import main_MTGP
+from src.pipeline_naive_last import main_naive_last
+from itertools import product
 
-cell_idx, var_idx, instants_idx = np.array(sys.argv)[1:].astype(int)-1
+#cell_idx, var_idx, instants_idx = np.array(sys.argv)[1:].astype(int)-1
 
+cell_idx, var_idx, instants_idx = np.array([0,0,0])
 
 cells = ['b1c0', 'b1c1', 'b1c2', 'b1c3', 'b1c4', 'b1c5', 'b1c6', 'b1c7',
        'b1c8', 'b1c9', 'b1c10', 'b1c11', 'b1c12', 'b1c13', 'b1c14',
@@ -36,22 +34,29 @@ cells = ['b1c0', 'b1c1', 'b1c2', 'b1c3', 'b1c4', 'b1c5', 'b1c6', 'b1c7',
        'b3c39', 'b3c40', 'b3c41', 'b3c44', 'b3c45']
 
 
+
 variables = ['V','Qd','T','I','Qc']
 instants_set = np.array([50, 100, 150])
 
-
+variables, instants_set = ['V','Qd','I','Qc'], [50, 100, 150]
 cell = cells[cell_idx]
 cqd = variables[var_idx]
 series_length = instants_set[instants_idx]
 
+combinations = list(product(instants_set, variables, cells))
+
+for series_length, cqd, cell in combinations:
+    #NAIVE
+    print(cell, cqd, series_length)
+    main_naive_last(n_instants = series_length, var = cqd, cell_name = cell)
 
 #UD
-main_GP(n_instants = series_length, var = cqd, cell_name = cell)
-main_ARIMA(n_instants = series_length, var = cqd, cell_name = cell)
-#MD
-main_BVAR(n_instants = series_length, var = cqd, cell_name = cell)
-main_LRVAR(n_instants = series_length, var = cqd, cell_name = cell)
-main_MTGP(n_instants = series_length, var = cqd, cell_name = cell)
+# main_GP(n_instants = series_length, var = cqd, cell_name = cell)
+# main_ARIMA(n_instants = series_length, var = cqd, cell_name = cell)
+# #MD
+# main_BVAR(n_instants = series_length, var = cqd, cell_name = cell)
+# main_LRVAR(n_instants = series_length, var = cqd, cell_name = cell)
+# main_MTGP(n_instants = series_length, var = cqd, cell_name = cell)
 
 
 

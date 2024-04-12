@@ -8,9 +8,10 @@ Created on Tue Feb  7 08:55:21 2023
 
 import sys
 import numpy as np
-from src.main_errors import errors
+from src.errors import errors
+from itertools import product
 
-cell_idx, var_idx, instants_idx = np.array(sys.argv)[1:].astype(int)-1
+#cell_idx, var_idx, instants_idx = np.array(sys.argv)[1:].astype(int)-1
 
 
 cells = ['b1c0', 'b1c1', 'b1c2', 'b1c3', 'b1c4', 'b1c5', 'b1c6', 'b1c7',
@@ -37,9 +38,15 @@ variables = ['V','Qd','T','I','Qc']
 instants_set = np.array([50, 100, 150])
 
 
-cell = cells[cell_idx]
-cqd = variables[var_idx]
-series_length = instants_set[instants_idx]
+# cell = cells[cell_idx]
+# cqd = variables[var_idx]
+# series_length = instants_set[instants_idx]
+
+combinations = list(product(instants_set, variables, cells))
+
+for series_length, cqd, cell in combinations:
+    print(cell, cqd, series_length)
+    errors(n_instants = series_length, var = cqd, cell_name = cell)
 
 
-errors(n_instants = series_length, var = cqd, cell_name = cell)
+#errors(n_instants = series_length, var = cqd, cell_name = cell)

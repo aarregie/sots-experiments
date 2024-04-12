@@ -14,11 +14,13 @@ plt.rcParams["figure.figsize"] = (30,15)
 import seaborn as sns
 
 
+analysis = ['mean', 'ARIMA', 'GP', 'BVAR', 'LRVAR', 'MTGP']
 analysis = ['ARIMA', 'GP', 'BVAR', 'LRVAR', 'MTGP']
+
 
 univariate = ['ARIMA','GP']
 multivariate = ['BVAR', 'LRVAR' 'MTGP']
-
+naive = ['mean']
 
 output_folder = os.path.join('output')
 predictions_folder = 'predictions'
@@ -31,8 +33,8 @@ n_instants_array = np.array([50,100,150])
 variables = ['Qd', 'Qc', 'I', 'V', 'T']
 variables_human = ['Discharge capacity', 'Charging capacity', 
                    'Internal Resistance', 'Voltage', 'Temperature']
+analysis_true = ['AVG','ARIMA', 'GP', 'BVAR', 'RRVAR', 'MTGP']
 analysis_true = ['ARIMA', 'GP', 'BVAR', 'RRVAR', 'MTGP']
-
 
 cells = ['b1c0', 'b1c1', 'b1c2', 'b1c3', 'b1c4', 'b1c5', 'b1c6', 'b1c7',
        'b1c8', 'b1c9', 'b1c10', 'b1c11', 'b1c12', 'b1c13', 'b1c14',
@@ -99,7 +101,7 @@ for index,n_instants in enumerate(n_instants_array):
         df_wide = df_wide.reset_index()
         
         df_wide['model'] = df_wide['model'].replace('LRVAR','RRVAR')
-        
+        df_wide['model'] = df_wide['model'].replace('mean', 'AVG')
         df_wide['var'] = var
         if df_wide_var.empty:
             df_wide_var = df_wide.copy()
@@ -115,13 +117,11 @@ for index,n_instants in enumerate(n_instants_array):
     else:
         df_all = pd.concat([df_all, df_wide_var], ignore_index = True)
 
-    
-    
     if index != 1:
-        line = sns.lineplot(ax = axes[index], data = df_wide_var, x = "Cycles", y = "Time (s)", hue = 'model', style = 'model', lw = 5,legend = False, ci = None)
+        line = sns.lineplot(ax = axes[index], data = df_wide_var, x = "Cycles", y = "Time (s)", hue = 'model', style = 'model', lw = 5, legend = False, ci = None)
         
     else:
-        line = sns.lineplot(ax = axes[index], data = df_wide_var, x = "Cycles", y = "Time (s)", lw = 5,hue = 'model', style = 'model',legend = 'full', ci = None)
+        line = sns.lineplot(ax = axes[index], data = df_wide_var, x = "Cycles", y = "Time (s)", hue = 'model', style = 'model', lw = 5, legend = 'full', ci = None)
                
         leg = axes[index].legend(bbox_to_anchor=(1.04, 0.5), loc="center left")
         
@@ -157,7 +157,7 @@ df_to_store = df_agg.groupby(['Cycles', 'model', 'T']).mean()
 
 df_to_store = df_to_store.reset_index()[['Time (s)', 'model', 'T']].copy()
 
-df_to_store = df_to_store.groupby([ 'model', 'T']).mean().reset_index()
+df_to_store = df_to_store.groupby(['model', 'T']).mean().reset_index()
 
     
 df_new = pd.DataFrame([])
@@ -167,9 +167,8 @@ for n_instants in n_instants_array:
     new_col = 'T = {}'.format(n_instants)
     df_filt = df_to_store.loc[df_to_store['T']==n_instants][['model','Time (s)']]
     
-    df_filt = df_filt.rename({'Time (s)': new_col}, axis =1)
-    
-    
+    df_filt = df_filt.rename({'Time (s)': new_col}, axis = 1)
+        
     df_filt = df_filt.set_index('model')
     if df_new.empty:
         df_new = df_filt.copy()
@@ -180,5 +179,5 @@ for n_instants in n_instants_array:
 df_new = df_new.reindex(analysis_true)
 
 agg_file_name = os.path.join(general_results,'training_time','TT.csv')
-df_new.to_csv(agg_file_name)
+#df_new.to_csv(agg_file_name)
 

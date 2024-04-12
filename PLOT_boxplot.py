@@ -15,11 +15,11 @@ plt.rcParams["figure.figsize"] = (20,15)
 from src.utils import directories
 import seaborn as sns
 
-analysis = ['ARIMA', 'GP', 'LRVAR', 'BVAR', 'MTGP']
+analysis = ['mean', 'last', 'ARIMA', 'GP', 'LRVAR', 'BVAR', 'MTGP']
 
 univariate = ['ARIMA','GP']
 multivariate = ['LRVAR', 'BVAR', 'MTGP']
-
+naive = ['mean', 'last']
 
 output_folder = os.path.join('output')
 predictions_folder = 'predictions'
@@ -64,7 +64,7 @@ plt.rcParams.update({'font.size': 20})
 
 error = 'NRMSE'
 
-analysis_true = ['ARIMA', 'GP', 'RRVAR', 'BVAR', 'MTGP']
+analysis_true = ['AVG', 'ARIMA', 'GP', 'RRVAR', 'BVAR', 'MTGP']
 
 results_folder = os.path.join(output_folder, 'general_results')
 
@@ -169,16 +169,16 @@ for n_instants in n_instants_array:
         #reset index
         df_bycell = df_bycell.reset_index()
         df_bycell_name = os.path.join(general_results, 'stats_bycell_{}_T{}.csv'.format(var, n_instants))
-        df_bycell.to_csv(df_bycell_name, index = False)
+        #df_bycell.to_csv(df_bycell_name, index = False)
     
         df_all_name = os.path.join(general_results, 'raw_results_{}_T{}.csv'.format(var, n_instants))
-        df_all_cells.to_csv(df_all_name, index = False)
+        #df_all_cells.to_csv(df_all_name, index = False)
     
         df_cells_name = os.path.join(general_results, 'raw_results_{}_T{}.csv'.format(var, n_instants))
-        df_all_cells.to_csv()
+        #df_all_cells.to_csv()
     
     #store statistics
-    res_n_instants.to_csv(res_file_name, index = False)
+    #res_n_instants.to_csv(res_file_name, index = False)
     
     df_instants['T'] = n_instants
     if df_instants.empty:
@@ -196,7 +196,7 @@ sns.set_theme(style='white', font_scale = 2)
 #plot using seaborn
 
 fig, axes = plt.subplots(5, 1, figsize=(20, 15), sharex=True)
-
+true_labels = ['$T = 50$', '$T = 100$', '$T = 150$']
 
 for index, var in enumerate(variables):
     
@@ -228,7 +228,7 @@ svg_file_name = os.path.join(general_results, 'boxplot.svg')
 png_file_name = os.path.join(general_results, 'boxplot.png')
 
 fig.tight_layout()
-fig.savefig(png_file_name)
+#fig.savefig(png_file_name)
 plt.show()
 
 
@@ -275,7 +275,7 @@ svg_file_name = os.path.join(general_results, 'boxplot_md.svg')
 png_file_name = os.path.join(general_results, 'boxplot_md.png')
 
 fig.tight_layout()
-fig.savefig(png_file_name)
+#fig.savefig(png_file_name)
 plt.show()
 
 
@@ -283,11 +283,12 @@ plt.show()
 
 #store numerical data
 df_all_instants['model'] = df_all_instants['model'].replace('LRVAR', 'RRVAR')
+df_all_instants['model'] = df_all_instants['model'].replace('mean', 'AVG')
+df_all_instants['model'] = df_all_instants['model'].replace('last', 'LAST')
 
 df_grouped = df_all_instants.groupby(['model','var', 'T']).agg(mean_error = ('error', 'mean'), var_error = ('error', 'var'))
 
 df_grouped = df_grouped.reset_index()
-
 
 
 for n_instants in n_instants_array:
@@ -317,5 +318,23 @@ for n_instants in n_instants_array:
 
     df_stats = df_stats.reset_index()
     file_name = os.path.join(general_results, 'stats_T{}.csv'.format(n_instants))
-    df_stats.to_csv(file_name, index = False)
+    # df_stats.to_csv(file_name, index = False)
 
+
+#%%
+
+#update stats_all.csv data
+#en stats_all se almacena el df_grouped
+
+model_to_append = ['AVG', 'LAST']
+df_append = df_grouped.loc[df_grouped['model'].isin(model_to_append)]
+
+file_name = os.path.join(general_results, 'stats_all.csv')
+file_name_excel = os.path.join(general_results, 'stats_all.xlsx')
+
+df_stats_all = pd.read_csv(file_name)
+
+df_stats_all = pd.concat([df_append, df_stats_all], ignore_index = True)
+df_stats_all.to_csv(file_name)
+
+df_stats_all.to_excel(file_name_excel)

@@ -16,11 +16,14 @@ import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (20,15)
 
 
-analysis = ['ARIMA', 'GP', 'BVAR', 'LRVAR', 'MTGP']
+analysis = ['ARIMA', 'GP', 'BVAR', 'LRVAR', 'MTGP', 'mean', 'last']
+#############
+analysis = ['last']
+#############
 
 univariate = ['ARIMA','GP']
 multivariate = ['BVAR', 'LRVAR' 'MTGP']
-
+naive = ['mean', 'last']
 
 output_folder = os.path.join('output')
 predictions_folder = 'predictions'
@@ -44,7 +47,8 @@ def errors(n_instants, var, cell_name):
             method = 'univariate'
         elif an_type in multivariate:
             method = 'multivariate'
-    
+        elif an_type in naive:
+            method = ''
         
         df_et = pd.DataFrame({})
         #Generate output path string
@@ -64,6 +68,8 @@ def errors(n_instants, var, cell_name):
                 
                 predicted_cycles = [int(cycle.replace('C','')) for cycle in predicted_cycles]
                 
+                mse_array, rmse_array, nrmse_array = np.array([]), np.array([]), np.array([])
+                
                 for file_name in data_files_an:
     
                     #t = cell[c][str(pc)]['t']
@@ -79,11 +85,16 @@ def errors(n_instants, var, cell_name):
                     mse = mean_squared_error(y, y_hat)
                     rmse = np.sqrt(mse)
                     nrmse = rmse/y_maxmin
-         
-                    pred_results = {'MSE': mse, 'RMSE': rmse, 'NRMSE': nrmse}
-                    df_et = df_et.append(pred_results, ignore_index = True)
+                    
+                    mse_array = np.append(mse_array, mse)
+                    rmse_array = np.append(rmse_array, rmse)
+                    nrmse_array = np.append(nrmse_array, nrmse)
+                    
+                                        
                 
-                df_et['cycles'] = predicted_cycles
+                pred_results = {'MSE': mse_array, 'RMSE': rmse_array, 'NRMSE': nrmse_array, 'cycles': predicted_cycles}
+                df_et = pd.DataFrame(pred_results)
+                
                 df_et = df_et.set_index('cycles')
                 df_et = df_et.sort_index()
                 errors_dict[an_type] = df_et
@@ -92,9 +103,18 @@ def errors(n_instants, var, cell_name):
     
     file_name = os.path.join('output', 'general_results', '{}_errors_{}_T{}.pickle'.format(cell_name, var, n_instants))
     
-    with open(file_name, 'wb') as handle:
-        pickle.dump(errors_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    if os.path.exists(file_name):
+        
+        errors = pd.read_pickle(file_name)
+        
+        errors_dict.update(errors)
+        
+        with open(file_name, 'wb') as handle:
+            pickle.dump(errors_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
+    else:
+        with open(file_name, 'wb') as handle:
+            pickle.dump(errors_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     
     
     
